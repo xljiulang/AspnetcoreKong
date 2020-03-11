@@ -1,0 +1,30 @@
+{
+  "kong": {
+    "adminApi": "http://localhost:8001",
+    "service": {
+      "url": "http://myservice",
+      "routes": [
+        {
+          "name": "route1",
+          "paths": [
+            "/api"
+          ],
+          "strip_path": false
+        }
+      ]
+    },
+    "upStream": {
+      "targets": [
+        {
+          "target": "127.0.0.1:520",
+          "weight": 100
+        }
+      ],
+      "healthchecks": {
+        "http_path": "/healthchecks",
+        "timeout": 1,
+        "type": "http"
+      }
+    }
+  }
+}

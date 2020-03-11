@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kong.Aspnetcore", "Kong.Aspnetcore\Kong.Aspnetcore.csproj", "{78DD5764-1900-4832-B3CB-210D9719DB75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Usage", "Usage\Usage.csproj", "{F1357494-7A1D-473F-8BC6-66086F704E05}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{78DD5764-1900-4832-B3CB-210D9719DB75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78DD5764-1900-4832-B3CB-210D9719DB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78DD5764-1900-4832-B3CB-210D9719DB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78DD5764-1900-4832-B3CB-210D9719DB75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1357494-7A1D-473F-8BC6-66086F704E05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1357494-7A1D-473F-8BC6-66086F704E05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1357494-7A1D-473F-8BC6-66086F704E05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1357494-7A1D-473F-8BC6-66086F704E05}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {308E74FF-F5B3-4A9F-93AF-A53B26DDED57}
+	EndGlobalSection
+EndGlobal
