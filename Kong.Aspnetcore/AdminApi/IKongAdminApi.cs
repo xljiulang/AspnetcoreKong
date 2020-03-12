@@ -8,17 +8,8 @@ namespace Kong.Aspnetcore.AdminApi
     /// <summary>
     /// 定义kong的管理接口
     /// </summary>
-    [TraceFilter(OutputTarget = OutputTarget.LoggerFactory)]
     public interface IKongAdminApi : IHttpApi
-    {
-        /// <summary>
-        /// 添加服务
-        /// </summary>
-        /// <param name="kongService"></param>
-        /// <returns></returns>
-        [HttpPost("/services")]
-        ITask<KongService> AddServiceAsync([JsonContent] KongServiceInput kongService);
-
+    { 
         /// <summary>
         /// 添加服务
         /// </summary>

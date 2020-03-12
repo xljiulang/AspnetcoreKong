@@ -1,17 +1,18 @@
 ﻿using Kong.Aspnetcore.AdminApi;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using WebApiClient.DataAnnotations;
 
 namespace Kong.Aspnetcore
 {
-    public class KongServiceOptions : KongServiceInput
+    /// <summary>
+    /// 表示kong服务选项
+    /// </summary>
+    public class KongServiceOptions : KongServiceEdit
     {
+        /// <summary>
+        /// 路由集合
+        /// </summary>
+        [IgnoreSerialized]
         public KongRouteEdit[] Routes { get; set; } = Array.Empty<KongRouteEdit>();
-
-        public string GetName()
-        {
-            return this.Url.Host;
-        }
     }
 }

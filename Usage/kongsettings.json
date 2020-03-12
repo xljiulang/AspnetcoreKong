@@ -1,13 +1,14 @@
 {
   "kong": {
-    "adminApi": "http://localhost:8001",
+    "adminApi": "http://10.0.1.222:8001",
     "service": {
-      "url": "http://myservice",
+      "name": "UsageService",
+      "host": "UsageService",
       "routes": [
         {
-          "name": "route1",
+          "name": "route2",
           "paths": [
-            "/api"
+            "/api/xx"
           ],
           "strip_path": false
         }
@@ -16,14 +17,25 @@
     "upStream": {
       "targets": [
         {
-          "target": "127.0.0.1:520",
+          "target": "{ip}:520",
           "weight": 100
         }
       ],
       "healthchecks": {
-        "http_path": "/healthchecks",
-        "timeout": 1,
-        "type": "http"
+        "active": {
+          "http_path": "/healthchecks",
+          "timeout": 5,
+          "unhealthy": {
+            "tcp_failures": 1,
+            "timeouts": 1,
+            "http_failures": 1,
+            "interval": 10
+          },
+          "healthy": {
+            "interval": 10,
+            "successes": 1
+          }
+        }
       }
     }
   }
