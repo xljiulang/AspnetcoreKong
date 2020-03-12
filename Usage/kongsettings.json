@@ -3,21 +3,27 @@
     "adminApi": "http://10.0.1.222:8001",
     "service": {
       "name": "UsageService",
-      "host": "UsageService",
+      "host": "UsageServiceUpstream",
       "routes": [
         {
-          "name": "route2",
+          "name": "AdminApi",
           "paths": [
-            "/api/xx"
+            "/api/admin"
           ],
           "strip_path": false
+        },
+        {
+          "name": "GuestApi",
+          "paths": [
+            "/api/guestapi"
+          ]
         }
       ]
     },
     "upStream": {
       "targets": [
         {
-          "target": "{ip}:520",
+          "target": "{localhost}:5000",
           "weight": 100
         }
       ],

@@ -5,14 +5,14 @@ using WebApiClient.DataAnnotations;
 namespace Kong.Aspnetcore
 {
     /// <summary>
-    /// 表示kong上游选项
+    /// 表示kong服务选项
     /// </summary>
-    public class KongUpStreamOptions : KongUpstreamEdit
+    public class KongServiceNode : KongServiceEdit
     {
         /// <summary>
-        /// 目标集合
+        /// 路由集合
         /// </summary>
         [IgnoreSerialized]
-        public KongTargetEdit[] Targets { get; set; } = Array.Empty<KongTargetEdit>();
+        public KongRouteEdit[] Routes { get; set; } = Array.Empty<KongRouteEdit>();
     }
 }

@@ -22,12 +22,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// 添加Kong配置
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="section">kong配置节点名称</param>
         /// <returns></returns>
-        public static IServiceCollection AddKong(this IServiceCollection services)
+        public static IServiceCollection AddKong(this IServiceCollection services, string section = "kong")
         {
             services.AddOptions<KongOptions>().Configure<IConfiguration>((o, c) =>
             {
-                c.GetSection("kong").Bind(o);
+                c.GetSection(section).Bind(o);
 
                 if (o.UpStream != null)
                 {
@@ -37,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     {
                         foreach (var target in o.UpStream.Targets)
                         {
-                            target.Target = Regex.Replace(target.Target, "{ip}|{localhost}", localIp.ToString(), RegexOptions.IgnoreCase);
+                            target.Target = Regex.Replace(target.Target, "{localhost}", localIp.ToString(), RegexOptions.IgnoreCase);
                         }
                     }
                 }
