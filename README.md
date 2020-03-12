@@ -7,4 +7,4 @@ aspnetcore微服务自动注册到kong的解决方案
 * 在Startup 添加services.AddKong();和 app.UseKong();
 
 ### Nuget安装
-<PackageReference Include="Kong.Aspnetcore" Version="1.0.0" />
+`<PackageReference Include="Kong.Aspnetcore" Version="1.0.0" />`
