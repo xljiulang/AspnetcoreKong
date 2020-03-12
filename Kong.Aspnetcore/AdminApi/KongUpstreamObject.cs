@@ -1,9 +1,9 @@
 ﻿namespace Kong.Aspnetcore.AdminApi
 {
     /// <summary>
-    /// 表示带id的kong对象
+    /// 表示kong上游
     /// </summary>
-    public class KongObject: IKongObject
+    public class KongUpstreamObject : KongUpstream, IKongObject
     {
         /// <summary>
         /// 唯一标识符

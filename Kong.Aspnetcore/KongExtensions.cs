@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 if (o.UpStream != null)
                 {
                     o.UpStream.Name = o.Service.Host;
-                    var localIp = LocalIPAddress.GetIPAddress(o.AdminApi.Host);
+                    var localIp = LocalIPAddress.GetMatchIPAddress(o.AdminApi.Host);
                     if (localIp != null)
                     {
                         foreach (var target in o.UpStream.Targets)

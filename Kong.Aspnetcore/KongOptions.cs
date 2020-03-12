@@ -25,11 +25,11 @@ namespace Kong.Aspnetcore
         /// 服务
         /// </summary>
         [Required]
-        public KongServiceNode Service { get; set; }
+        public KongServiceOptions Service { get; set; }
 
         /// <summary>
         /// 上游
         /// </summary>
-        public KongUpStreamNode UpStream { get; set; }
+        public KongUpStreamOptions UpStream { get; set; }
     }
 }

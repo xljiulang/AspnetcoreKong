@@ -4,7 +4,7 @@
     /// 表示kong响应数据
     /// </summary>
     /// <typeparam name="TData"></typeparam>
-    public class KongArrayData<TData>
+    public class KongArray<TData>
     {
         /// <summary>
         /// 数据

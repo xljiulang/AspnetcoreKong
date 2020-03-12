@@ -16,7 +16,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="kongService"></param>
         /// <returns></returns>
         [HttpPost("/services")]
-        ITask<KongService> AddServiceAsync([JsonContent] KongServiceEdit kongService);
+        ITask<KongServiceObject> AddServiceAsync([JsonContent] KongService kongService);
 
         /// <summary>
         /// 获取单个服务
@@ -25,14 +25,14 @@ namespace Kong.Aspnetcore.AdminApi
         /// <returns></returns>
 
         [HttpGet("/services/{nameOrId}")]
-        ITask<KongService> GetServiceAsync([Required]string nameOrId);
+        ITask<KongServiceObject> GetServiceAsync([Required]string nameOrId);
 
         /// <summary>
         /// 获取所有服务
         /// </summary>
         /// <returns></returns>
         [HttpGet("/services")]
-        ITask<KongArrayData<KongService>> GetServicesAsync();
+        ITask<KongArray<KongServiceObject>> GetServicesAsync();
 
         /// <summary>
         /// 更新服务
@@ -41,7 +41,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="kongService"></param>
         /// <returns></returns>
         [HttpPatch("/services/{nameOrId}")]
-        ITask<KongService> UpdateServiceAsync([Required]string nameOrId, [JsonContent]KongServiceEdit kongService);
+        ITask<KongServiceObject> UpdateServiceAsync([Required]string nameOrId, [JsonContent]KongService kongService);
 
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="kongRoute"></param>
         /// <returns></returns>
         [HttpPost("/services/{serviceNameOrId}/routes")]
-        ITask<KongRoute> AddRouteAsync([Required]string serviceNameOrId, [JsonContent] KongRouteEdit kongRoute);
+        ITask<KongRouteObject> AddRouteAsync([Required]string serviceNameOrId, [JsonContent] KongRoute kongRoute);
 
 
         /// <summary>
@@ -69,14 +69,14 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="nameOrId"></param>
         /// <returns></returns>
         [HttpGet("/routes/{nameOrId}")]
-        ITask<KongRoute> GetRouteAsync([Required]string nameOrId);
+        ITask<KongRouteObject> GetRouteAsync([Required]string nameOrId);
 
         /// <summary>
         /// 获取所有路由
         /// </summary>
         /// <returns></returns>
         [HttpGet("/routes")]
-        ITask<KongArrayData<KongRoute>> GetRoutesAsync();
+        ITask<KongArray<KongRouteObject>> GetRoutesAsync();
 
         /// <summary>
         /// 获取服务下的路由
@@ -84,7 +84,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="serviceNameOrId"></param>
         /// <returns></returns>
         [HttpGet("/services/{serviceNameOrId}/routes")]
-        ITask<KongArrayData<KongRoute>> GetRoutesAsync([Required]string serviceNameOrId);
+        ITask<KongArray<KongRouteObject>> GetRoutesAsync([Required]string serviceNameOrId);
 
         /// <summary>
         /// 更新路由
@@ -93,7 +93,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="kongRoute"></param>
         /// <returns></returns>
         [HttpPatch("/routes/{nameOrId}")]
-        ITask<KongRoute> UpdateRouteAsync([Required]string nameOrId, [JsonContent]KongRouteEdit kongRoute);
+        ITask<KongRouteObject> UpdateRouteAsync([Required]string nameOrId, [JsonContent]KongRoute kongRoute);
 
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="kongUpstream"></param>
         /// <returns></returns>
         [HttpPost("/upstreams")]
-        ITask<KongUpstream> AddUpstreamAsync([JsonContent] KongUpstreamEdit kongUpstream);
+        ITask<KongUpstreamObject> AddUpstreamAsync([JsonContent] KongUpstream kongUpstream);
 
         /// <summary>
         /// 获取上游
@@ -119,14 +119,14 @@ namespace Kong.Aspnetcore.AdminApi
         /// <returns></returns>
 
         [HttpGet("/upstreams/{nameOrId}")]
-        ITask<KongUpstream> GetUpstreamAsync([Required]string nameOrId);
+        ITask<KongUpstreamObject> GetUpstreamAsync([Required]string nameOrId);
 
         /// <summary>
         /// 获取所有上游
         /// </summary>
         /// <returns></returns>
         [HttpGet("/upstreams")]
-        ITask<KongArrayData<KongUpstream>> GetUpstreamsAsync();
+        ITask<KongArray<KongUpstreamObject>> GetUpstreamsAsync();
 
         /// <summary>
         /// 更新上游
@@ -135,7 +135,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="kongUpstream"></param>
         /// <returns></returns>
         [HttpPatch("/upstreams/{nameOrId}")]
-        ITask<KongUpstream> UpdateUpstreamAsync([Required]string nameOrId, [JsonContent]KongUpstreamEdit kongUpstream);
+        ITask<KongUpstreamObject> UpdateUpstreamAsync([Required]string nameOrId, [JsonContent]KongUpstream kongUpstream);
 
         /// <summary>
         /// 删除上游
@@ -153,7 +153,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <returns></returns>
 
         [HttpPost("/upstreams/{upstreamId}/targets")]
-        ITask<KongTarget> AddTargetAsync([Required] string upstreamId, [JsonContent] KongTargetEdit kongTarget);
+        ITask<KongTargetObject> AddTargetAsync([Required] string upstreamId, [JsonContent] KongTarget kongTarget);
 
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="upstreamId"></param>
         /// <returns></returns>
         [HttpGet("/upstreams/{upstreamId}/targets")]
-        ITask<KongArrayData<KongTarget>> GetTargetsAsync([Required] string upstreamId);
+        ITask<KongArray<KongTargetObject>> GetTargetsAsync([Required] string upstreamId);
 
 
         /// <summary>

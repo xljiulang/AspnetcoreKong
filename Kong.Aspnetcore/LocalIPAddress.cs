@@ -17,10 +17,10 @@ namespace Kong.Aspnetcore
         /// </summary>
         /// <param name="hostnameOrAddress"></param>
         /// <returns></returns>
-        public static IPAddress GetIPAddress(string hostnameOrAddress)
+        public static IPAddress GetMatchIPAddress(string hostnameOrAddress)
         {
             var kongIps = Dns.GetHostAddresses(hostnameOrAddress);
-            var targets = kongIps.Select(item => GetIPAddress(item));
+            var targets = kongIps.Select(item => GetMatchIPAddress(item));
             return targets.FirstOrDefault(item => item != null);
         }
 
@@ -29,7 +29,7 @@ namespace Kong.Aspnetcore
         /// </summary>
         /// <param name="ipaddress">目标ipaddress</param>
         /// <returns></returns>
-        public static IPAddress GetIPAddress(IPAddress ipaddress)
+        public static IPAddress GetMatchIPAddress(IPAddress ipaddress)
         {
             var nets = NetworkInterface.GetAllNetworkInterfaces();
             var gateways = nets.SelectMany(net => net.GetIPProperties().GatewayAddresses.Select(item => item.Address));

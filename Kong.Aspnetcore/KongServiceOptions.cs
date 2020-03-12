@@ -7,12 +7,12 @@ namespace Kong.Aspnetcore
     /// <summary>
     /// 表示kong服务选项
     /// </summary>
-    public class KongServiceNode : KongServiceEdit
+    public class KongServiceOptions : KongService
     {
         /// <summary>
         /// 路由集合
         /// </summary>
         [IgnoreSerialized]
-        public KongRouteEdit[] Routes { get; set; } = Array.Empty<KongRouteEdit>();
+        public KongRoute[] Routes { get; set; } = Array.Empty<KongRoute>();
     }
 }
