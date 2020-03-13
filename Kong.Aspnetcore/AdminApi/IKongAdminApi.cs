@@ -8,8 +8,9 @@ namespace Kong.Aspnetcore.AdminApi
     /// <summary>
     /// 定义kong的管理接口
     /// </summary>
+    [Timeout(1000)]
     public interface IKongAdminApi : IHttpApi
-    { 
+    {
         /// <summary>
         /// 添加服务
         /// </summary>

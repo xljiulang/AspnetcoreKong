@@ -1,5 +1,6 @@
 ﻿using Kong.Aspnetcore.AdminApi;
 using System;
+using System.Collections.Generic;
 using WebApiClient.DataAnnotations;
 
 namespace Kong.Aspnetcore
@@ -13,6 +14,6 @@ namespace Kong.Aspnetcore
         /// 目标集合
         /// </summary>
         [IgnoreSerialized]
-        public KongTarget[] Targets { get; set; } = Array.Empty<KongTarget>();
+        public List<KongTarget> Targets { get; set; } = new List<KongTarget>();
     }
 }

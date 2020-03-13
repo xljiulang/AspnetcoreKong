@@ -8,28 +8,28 @@ using System.Net.Sockets;
 namespace Kong.Aspnetcore
 {
     /// <summary>
-    /// 提供本机ip获取
+    /// 提供本机局域网ip获取
     /// </summary>
-    static class LocalIPAddress
+    static class LANIPAddress
     {
         /// <summary>
-        /// 返回本地与目标ipaddress同一网段的ip
+        /// 返回与目标域名或ip在同一网段的本机ip
         /// </summary>
-        /// <param name="hostnameOrAddress"></param>
+        /// <param name="targetHost">目标域名或ip</param>
         /// <returns></returns>
-        public static IPAddress GetMatchIPAddress(string hostnameOrAddress)
+        public static IPAddress GetMatchLANIPAddress(string targetHost)
         {
-            var kongIps = Dns.GetHostAddresses(hostnameOrAddress);
-            var targets = kongIps.Select(item => GetMatchIPAddress(item));
+            var targetIpAddressArray = Dns.GetHostAddresses(targetHost);
+            var targets = targetIpAddressArray.Select(item => GetMatchLANIPAddress(item));
             return targets.FirstOrDefault(item => item != null);
         }
 
         /// <summary>
-        /// 返回本地与目标ipaddress同一网段的ip
+        /// 返回与目标ip在同一网段的本机ip
         /// </summary>
-        /// <param name="ipaddress">目标ipaddress</param>
+        /// <param name="targetIPAddress">目标ipaddress</param>
         /// <returns></returns>
-        public static IPAddress GetMatchIPAddress(IPAddress ipaddress)
+        public static IPAddress GetMatchLANIPAddress(IPAddress targetIPAddress)
         {
             var nets = NetworkInterface.GetAllNetworkInterfaces();
             var gateways = nets.SelectMany(net => net.GetIPProperties().GatewayAddresses.Select(item => item.Address));
@@ -41,7 +41,7 @@ namespace Kong.Aspnetcore
                     orderby BinaryPrimitives.ReadInt32BigEndian(i.IPv4Mask.GetAddressBytes())
                     select new { ip = i.Address, gateway = g, mask = i.IPv4Mask };
 
-            var network = q.FirstOrDefault(item => ipaddress.IsInNetwork(item.gateway, item.mask));
+            var network = q.FirstOrDefault(item => targetIPAddress.IsInNetwork(item.gateway, item.mask));
             return network?.ip;
         }
 

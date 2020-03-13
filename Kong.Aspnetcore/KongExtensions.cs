@@ -26,31 +26,66 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddKong(this IServiceCollection services, string section = "kong")
         {
-            services.AddOptions<KongOptions>().Configure<IConfiguration>((o, c) =>
+            return services.AddKongCore((o, s) =>
             {
-                c.GetSection(section).Bind(o);
+                s.GetService<IConfiguration>().GetSection(section).Bind(o);
+            });
+        }
 
-                if (o.UpStream != null)
+        /// <summary>
+        /// 添加Kong配置
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configureOptions">kong选项配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddKong(this IServiceCollection services, Action<KongOptionsEditor, IServiceProvider> configureOptions)
+        {
+            return services.AddKongCore((o, s) =>
+            {
+                var editor = new KongOptionsEditor(o);
+                configureOptions?.Invoke(editor, s);
+            });
+        }
+
+        /// <summary>
+        /// 添加Kong配置
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configureOptions">kong选项配置</param>
+        /// <returns></returns>
+        private static IServiceCollection AddKongCore(this IServiceCollection services, Action<KongOptions, IServiceProvider> configureOptions)
+        {
+            services
+                .AddOptions<KongOptions>()
+                .Configure(configureOptions)
+                .Configure(o =>
                 {
-                    o.UpStream.Name = o.Service.Host;
-                    var localIp = LocalIPAddress.GetMatchIPAddress(o.AdminApi.Host);
-                    if (localIp != null)
+                    if (o.UpStream != null)
                     {
+                        o.UpStream.Name = o.Service.Host;
+                        var localIp = LANIPAddress.GetMatchLANIPAddress(o.AdminApi.Host);
+
                         foreach (var target in o.UpStream.Targets)
                         {
-                            target.Target = Regex.Replace(target.Target, "{localhost}", localIp.ToString(), RegexOptions.IgnoreCase);
+                            target.Target = Regex.Replace(target.Target, "{localhost}", match =>
+                            {
+                                if (localIp == null)
+                                {
+                                    throw new LANIPAddressNotMatchException($"无法获取到与{o.AdminApi.Host}处在同一网段的本机局域网ip");
+                                }
+                                return localIp.ToString();
+                            }, RegexOptions.IgnoreCase);
                         }
                     }
-                }
 
-                if (o.RouteNamePrefix == true)
-                {
-                    foreach (var route in o.Service.Routes)
+                    if (o.RouteNamePrefix == true)
                     {
-                        route.Name = $"{o.Service.Name}_{route.Name}";
+                        foreach (var route in o.Service.Routes)
+                        {
+                            route.Name = $"{o.Service.Name}_{route.Name}";
+                        }
                     }
-                }
-            });
+                });
 
             services.AddHttpApi<IKongAdminApi>((o, s) =>
             {
@@ -70,11 +105,14 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             try
             {
-                await UseKongAsync(app.ApplicationServices);
+                var logger = app.ApplicationServices.GetService<ILogger<IKongAdminApi>>();
+                var local = app.ApplicationServices.GetService<IOptions<KongOptions>>().Value;
+                var kong = app.ApplicationServices.GetService<IKongAdminApi>();
+                await UseKongAsync(local, kong, logger);
             }
             catch (Exception ex)
             {
-                var logger = app.ApplicationServices.GetService<ILogger<KongOptions>>();
+                var logger = app.ApplicationServices.GetService<ILogger<IKongAdminApi>>();
                 logger.LogError(ex, ex.Message);
             }
         }
@@ -82,14 +120,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// 使用kong
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="kong"></param>
+        /// <param name="local"></param>
+        /// <param name="logger"></param>
         /// <returns></returns>
-        private static async Task UseKongAsync(IServiceProvider provider)
+        private static async Task UseKongAsync(KongOptions local, IKongAdminApi kong, ILogger<IKongAdminApi> logger)
         {
-            var kong = provider.GetService<IKongAdminApi>();
-            var local = provider.GetService<IOptions<KongOptions>>().Value;
-            var logger = provider.GetService<ILogger<KongOptions>>();
-
             var service = await kong.GetServiceAsync(local.Service.Name).HandleAsDefaultWhenException();
             if (service == null)
             {

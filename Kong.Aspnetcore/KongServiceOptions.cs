@@ -1,5 +1,6 @@
 ﻿using Kong.Aspnetcore.AdminApi;
 using System;
+using System.Collections.Generic;
 using WebApiClient.DataAnnotations;
 
 namespace Kong.Aspnetcore
@@ -13,6 +14,6 @@ namespace Kong.Aspnetcore
         /// 路由集合
         /// </summary>
         [IgnoreSerialized]
-        public KongRoute[] Routes { get; set; } = Array.Empty<KongRoute>();
+        public List<KongRoute> Routes { get; set; } = new List<KongRoute>();
     }
 }
