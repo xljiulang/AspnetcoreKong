@@ -22,25 +22,34 @@ namespace Microsoft.Extensions.DependencyInjection
         /// 添加Kong配置
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="section">kong配置节点名称</param>
         /// <returns></returns>
-        public static IServiceCollection AddKong(this IServiceCollection services, string section = "kong")
+        public static IServiceCollection AddKong(this IServiceCollection services)
         {
-            return services.AddKongCore((o, s) =>
-            {
-                s.GetService<IConfiguration>().GetSection(section).Bind(o);
-            });
+            return services.AddKong("kong");
         }
 
         /// <summary>
         /// 添加Kong配置
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="section">kong配置节点名称</param>
+        /// <returns></returns>
+        public static IServiceCollection AddKong(this IServiceCollection services, string section)
+        {
+            return services.AddKong(section, (o, s) => { });
+        }
+
+
+        /// <summary>
+        /// 添加Kong配置
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="section">kong配置节点名称</param>
         /// <param name="configureOptions">kong选项配置</param>
         /// <returns></returns>
-        public static IServiceCollection AddKong(this IServiceCollection services, Action<KongOptionsEditor, IServiceProvider> configureOptions)
+        public static IServiceCollection AddKong(this IServiceCollection services, string section, Action<KongOptionsEditor, IServiceProvider> configureOptions)
         {
-            return services.AddKongCore((o, s) =>
+            return services.AddKongCore(section, (o, s) =>
             {
                 var editor = new KongOptionsEditor(o);
                 configureOptions?.Invoke(editor, s);
@@ -51,12 +60,14 @@ namespace Microsoft.Extensions.DependencyInjection
         /// 添加Kong配置
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="section"></param>
         /// <param name="configureOptions">kong选项配置</param>
         /// <returns></returns>
-        private static IServiceCollection AddKongCore(this IServiceCollection services, Action<KongOptions, IServiceProvider> configureOptions)
+        private static IServiceCollection AddKongCore(this IServiceCollection services, string section, Action<KongOptions, IServiceProvider> configureOptions)
         {
             services
                 .AddOptions<KongOptions>()
+                .Configure<IConfiguration>((o, c) => c.GetSection(section).Bind(o))
                 .Configure(configureOptions)
                 .Configure(o =>
                 {

@@ -22,7 +22,7 @@ namespace Usage
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((h, c) =>
                 {
-                    c.AddJsonFile("kongsettings.json", optional: false);
+                   // c.AddJsonFile("kongsettings.json", optional: false);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
