@@ -89,9 +89,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddHttpApi<IKongAdminApi>((o, s) =>
             {
-                var kong = s.GetService<IOptions<KongOptions>>().Value;
-                o.HttpHost = kong.AdminApi;
+                o.HttpHost = s.GetService<IOptions<KongOptions>>().Value.AdminApi;
                 o.FormatOptions = new FormatOptions { UseCamelCase = true };
+            })
+            .ConfigureHttpClient((s, c) =>
+            {
+                var headers = s.GetService<IOptions<KongOptions>>().Value.AdminApiHeaders;
+                foreach (var item in headers)
+                {
+                    c.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
+                }
             });
 
             return services;
@@ -126,7 +133,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static async Task UseKongAsync(KongOptions local, IKongAdminApi kong, ILogger<IKongAdminApi> logger)
         {
-            var service = await kong.GetServiceAsync(local.Service.Name).HandleAsDefaultWhenException();
+            var service = await kong.GetServiceAsync(local.Service.Name);
             if (service == null)
             {
                 logger.LogInformation($"正在添加服务{local.Service.Name}");
@@ -165,7 +172,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (local.UpStream != null)
             {
-                var upStream = await kong.GetUpstreamAsync(local.UpStream.Name).HandleAsDefaultWhenException();
+                var upStream = await kong.GetUpstreamAsync(local.UpStream.Name);
                 if (upStream == null)
                 {
                     logger.LogInformation($"正在添加上游{upStream.Name}");

@@ -20,7 +20,7 @@ namespace Kong.Aspnetcore
         }
 
         /// <summary>
-        /// 指定AdminApi地址
+        /// 指定AdminApi请求地址
         /// </summary>
         /// <param name="host">kong的ip或域名</param>
         /// <param name="port">admin管理端口</param>
@@ -28,6 +28,18 @@ namespace Kong.Aspnetcore
         public KongOptionsEditor WithAdminApi(string host, int port = 8001)
         {
             this.options.AdminApi = new Uri($"http://{host}:{port}");
+            return this;
+        }
+
+        /// <summary>
+        /// 指定AdminApi请求头
+        /// </summary>
+        /// <param name="name">键</param>
+        /// <param name="value">值</param>
+        /// <returns></returns>
+        public KongOptionsEditor WithAdminApiHeader(string name, string value)
+        {
+            this.options.AdminApiHeaders.TryAdd(name, value);
             return this;
         }
 

@@ -16,7 +16,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// </summary>
         /// <param name="kongService"></param>
         /// <returns></returns>
-        [HttpPost("/services")]
+        [HttpPost("/services")]      
         ITask<KongServiceObject> AddServiceAsync([JsonContent] KongService kongService);
 
         /// <summary>
@@ -26,6 +26,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <returns></returns>
 
         [HttpGet("/services/{nameOrId}")]
+        [KongNotFoundAsNullReturn]
         ITask<KongServiceObject> GetServiceAsync([Required]string nameOrId);
 
         /// <summary>
@@ -70,6 +71,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="nameOrId"></param>
         /// <returns></returns>
         [HttpGet("/routes/{nameOrId}")]
+        [KongNotFoundAsNullReturn]
         ITask<KongRouteObject> GetRouteAsync([Required]string nameOrId);
 
         /// <summary>
@@ -120,6 +122,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <returns></returns>
 
         [HttpGet("/upstreams/{nameOrId}")]
+        [KongNotFoundAsNullReturn]
         ITask<KongUpstreamObject> GetUpstreamAsync([Required]string nameOrId);
 
         /// <summary>

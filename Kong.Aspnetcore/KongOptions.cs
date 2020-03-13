@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
@@ -17,6 +18,11 @@ namespace Kong.Aspnetcore
         public Uri AdminApi { get; set; }
 
         /// <summary>
+        /// AdminApi的请求头
+        /// </summary>
+        public Dictionary<string, string> AdminApiHeaders { get; set; } = new Dictionary<string, string>();
+
+        /// <summary>
         /// 自动给路由名称添加前缀
         /// </summary>
         public bool RouteNamePrefix { get; set; } = true;
@@ -30,6 +36,6 @@ namespace Kong.Aspnetcore
         /// <summary>
         /// 上游
         /// </summary>
-        public KongUpStreamOptions UpStream { get; set; } 
+        public KongUpStreamOptions UpStream { get; set; }
     }
 }
