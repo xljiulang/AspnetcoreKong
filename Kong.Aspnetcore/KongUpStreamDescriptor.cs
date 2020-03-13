@@ -1,19 +1,18 @@
 ﻿using Kong.Aspnetcore.AdminApi;
-using System;
 using System.Collections.Generic;
 using WebApiClient.DataAnnotations;
 
 namespace Kong.Aspnetcore
 {
     /// <summary>
-    /// 表示kong服务选项
+    /// 表示kong上游节点
     /// </summary>
-    public class KongServiceOptions : KongService
+    public class KongUpStreamDescriptor : KongUpstream
     {
         /// <summary>
-        /// 路由集合
+        /// 目标集合
         /// </summary>
         [IgnoreSerialized]
-        public List<KongRoute> Routes { get; set; } = new List<KongRoute>();
+        public List<KongTarget> Targets { get; set; } = new List<KongTarget>();
     }
 }

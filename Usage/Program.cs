@@ -14,7 +14,7 @@ namespace Usage
     public class Program
     {
         public static void Main(string[] args)
-        { 
+        {
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -22,7 +22,7 @@ namespace Usage
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((h, c) =>
                 {
-                   // c.AddJsonFile("kongsettings.json", optional: false);
+                    c.AddJsonFile("kongsettings.json", optional: false);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

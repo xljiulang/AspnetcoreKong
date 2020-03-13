@@ -19,30 +19,6 @@
           ]
         }
       ]
-    },
-    "upStream": {
-      "targets": [
-        {
-          "target": "{localhost}:5000",
-          "weight": 100
-        }
-      ],
-      "healthchecks": {
-        "active": {
-          "http_path": "/healthchecks",
-          "timeout": 5,
-          "unhealthy": {
-            "tcp_failures": 1,
-            "timeouts": 1,
-            "http_failures": 1,
-            "interval": 10
-          },
-          "healthy": {
-            "interval": 10,
-            "successes": 1
-          }
-        }
-      }
     }
   }
 }

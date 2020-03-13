@@ -12,7 +12,6 @@ using WebApiClient;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-
     /// <summary>
     /// kong注册扩展
     /// </summary>
@@ -36,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddKong(this IServiceCollection services, string section)
         {
-            return services.AddKong(section, (o, s) => { });
+            return services.AddKong(section, o => { });
         }
 
 
@@ -47,23 +46,19 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="section">kong配置节点名称</param>
         /// <param name="configureOptions">kong选项配置</param>
         /// <returns></returns>
-        public static IServiceCollection AddKong(this IServiceCollection services, string section, Action<KongOptionsEditor, IServiceProvider> configureOptions)
+        public static IServiceCollection AddKong(this IServiceCollection services, string section, Action<KongOptions> configureOptions)
         {
-            return services.AddKongCore(section, (o, s) =>
-            {
-                var editor = new KongOptionsEditor(o);
-                configureOptions?.Invoke(editor, s);
-            });
+            return services.AddKong(section, (o, s) => configureOptions?.Invoke(o));
         }
 
         /// <summary>
         /// 添加Kong配置
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="section"></param>
+        /// <param name="section">kong配置节点名称</param>
         /// <param name="configureOptions">kong选项配置</param>
         /// <returns></returns>
-        private static IServiceCollection AddKongCore(this IServiceCollection services, string section, Action<KongOptions, IServiceProvider> configureOptions)
+        public static IServiceCollection AddKong(this IServiceCollection services, string section, Action<KongOptions, IServiceProvider> configureOptions)
         {
             services
                 .AddOptions<KongOptions>()
