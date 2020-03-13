@@ -89,13 +89,13 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddHttpApi<IKongAdminApi>((o, s) =>
             {
-                o.HttpHost = s.GetService<IOptions<KongOptions>>().Value.AdminApi;
                 o.FormatOptions = new FormatOptions { UseCamelCase = true };
             })
             .ConfigureHttpClient((s, c) =>
             {
-                var headers = s.GetService<IOptions<KongOptions>>().Value.AdminApiHeaders;
-                foreach (var item in headers)
+                var kong = s.GetService<IOptions<KongOptions>>().Value;
+                c.BaseAddress = kong.AdminApi;
+                foreach (var item in kong.AdminApiHeaders)
                 {
                     c.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
                 }
