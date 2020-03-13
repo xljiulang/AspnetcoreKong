@@ -77,7 +77,7 @@ namespace Kong.Aspnetcore
         /// 指定服务
         /// </summary>
         /// <param name="name">服务名</param>
-        /// <param name="host">主机(当配置upstream时，值为upstream的名称)</param>
+        /// <param name="host">主机(当配置upstream时，upstream的名称为该值)</param>
         /// <param name="port">服务端口(当配置upstream时，不使用该值）</param>
         /// <param name="path">服务路径(当配置upstream时，不使用该值）</param>
         /// <returns></returns>
