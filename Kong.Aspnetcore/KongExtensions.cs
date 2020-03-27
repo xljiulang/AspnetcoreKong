@@ -160,9 +160,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 }
                 else
                 {
-                    logger.LogInformation($"正在添加路由{route.Name}");
+                    logger.LogInformation($"正在添加路由{localRoute.Name}");
                     await kong.AddRouteAsync(service.Id, localRoute);
-                    logger.LogInformation($"添加路由{route.Name} ok.");
+                    logger.LogInformation($"添加路由{localRoute.Name} ok.");
                 }
             }
 
@@ -181,9 +181,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 var upStream = await kong.GetUpstreamAsync(local.UpStream.Name);
                 if (upStream == null)
                 {
-                    logger.LogInformation($"正在添加上游{upStream.Name}");
+                    logger.LogInformation($"正在添加上游{local.UpStream.Name}");
                     upStream = await kong.AddUpstreamAsync(local.UpStream);
-                    logger.LogInformation($"添加上游{upStream.Name} ok.");
+                    logger.LogInformation($"添加上游{local.UpStream.Name} ok.");
                 }
                 else
                 {
