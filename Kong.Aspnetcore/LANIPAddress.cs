@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -31,18 +32,33 @@ namespace Kong.Aspnetcore
         /// <returns></returns>
         public static IPAddress GetMatchLANIPAddress(IPAddress targetIPAddress)
         {
-            var nets = NetworkInterface.GetAllNetworkInterfaces();
-            var gateways = nets.SelectMany(net => net.GetIPProperties().GatewayAddresses.Select(item => item.Address));
-            var ips = nets.SelectMany(net => net.GetIPProperties().UnicastAddresses.Where(item => item.Address.AddressFamily == AddressFamily.InterNetwork));
+            static IEnumerable<(IPAddress ip, IPAddress mask, IPAddress gateway)> GetIpConfigs(NetworkInterface network)
+            {
+                var gateways = network.GetIPProperties()
+                    .GatewayAddresses
+                    .Select(item => item.Address)
+                    .Where(item => item.AddressFamily == AddressFamily.InterNetwork);
 
-            var q = from g in gateways
-                    join i in ips
-                    on g.GetAddressBytes().First() equals i.Address.GetAddressBytes().First()
-                    orderby BinaryPrimitives.ReadInt32BigEndian(i.IPv4Mask.GetAddressBytes())
-                    select new { ip = i.Address, gateway = g, mask = i.IPv4Mask };
+                var ipMasks = network.GetIPProperties()
+                    .UnicastAddresses
+                    .Where(item => item.Address.AddressFamily == AddressFamily.InterNetwork);
 
-            var network = q.FirstOrDefault(item => targetIPAddress.IsInNetwork(item.gateway, item.mask));
-            return network?.ip;
+                return from gateway in gateways
+                       join ipMask in ipMasks
+                       on true equals true
+                       where ipMask.Address.IsInNetwork(gateway, ipMask.IPv4Mask)
+                       orderby BinaryPrimitives.ReadInt32BigEndian(ipMask.Address.GetAddressBytes())
+                       select (ipMask.Address, ipMask.IPv4Mask, gateway);
+            }
+
+            var match = NetworkInterface
+                .GetAllNetworkInterfaces()
+                .OrderBy(item => item.OperationalStatus)
+                .SelectMany(item => GetIpConfigs(item))
+                .Where(item => targetIPAddress.IsInNetwork(item.gateway, item.mask))
+                .FirstOrDefault();
+
+            return match.ip;
         }
 
 
