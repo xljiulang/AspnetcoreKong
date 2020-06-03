@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Net.Http;
-using WebApiClient;
-using WebApiClient.Attributes;
+using System.Threading.Tasks;
+using WebApiClientCore;
+using WebApiClientCore.Attributes;
 
 namespace Kong.Aspnetcore.AdminApi
 {
@@ -52,7 +52,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="nameOrId"></param>
         /// <returns></returns>
         [HttpDelete("/services/{nameOrId}")]
-        ITask<HttpResponseMessage> DeleteServiceAsync([Required]string nameOrId);
+        Task DeleteServiceAsync([Required]string nameOrId);
 
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="nameOrId"></param>
         /// <returns></returns>
         [HttpDelete("/routes/{nameOrId}")]
-        ITask<HttpResponseMessage> DeleteRouteAsync([Required]string nameOrId);
+        Task DeleteRouteAsync([Required]string nameOrId);
 
         /// <summary>
         /// 添加上游
@@ -147,7 +147,7 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="nameOrId"></param>
         /// <returns></returns>
         [HttpDelete("/Upstreams/{nameOrId}")]
-        ITask<HttpResponseMessage> DeleteUpstreamAsync([Required]string nameOrId);
+        Task DeleteUpstreamAsync([Required]string nameOrId);
 
         /// <summary>
         /// 为上游添加目标
@@ -176,6 +176,6 @@ namespace Kong.Aspnetcore.AdminApi
         /// <param name="targetId"></param>
         /// <returns></returns>
         [HttpDelete("/Upstreams/{upstreamId}/targets{targetId}")]
-        ITask<HttpResponseMessage> DeleteTargetAsync([Required]string upstreamId, [Required]string targetId);
+        Task DeleteTargetAsync([Required]string upstreamId, [Required]string targetId);
     }
 }

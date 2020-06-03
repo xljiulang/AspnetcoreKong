@@ -8,7 +8,6 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using WebApiClient;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -93,19 +92,17 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
                 });
 
-            services.AddHttpApi<IKongAdminApi>((o, s) =>
-            {
-                o.FormatOptions = new FormatOptions { UseCamelCase = true };
-            })
-            .ConfigureHttpClient((s, c) =>
-            {
-                var kong = s.GetService<IOptions<KongOptions>>().Value;
-                c.BaseAddress = kong.AdminApi;
-                foreach (var item in kong.AdminApiHeaders)
+            services
+                .AddHttpApi<IKongAdminApi>()
+                .ConfigureHttpClient((s, c) =>
                 {
-                    c.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
-                }
-            });
+                    var kong = s.GetService<IOptions<KongOptions>>().Value;
+                    c.BaseAddress = kong.AdminApi;
+                    foreach (var item in kong.AdminApiHeaders)
+                    {
+                        c.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
+                    }
+                });
 
             return services;
         }

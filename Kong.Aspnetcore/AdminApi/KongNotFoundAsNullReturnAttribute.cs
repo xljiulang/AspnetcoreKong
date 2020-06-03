@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using WebApiClient.Attributes;
-using WebApiClient.Contexts;
+using WebApiClientCore;
+using WebApiClientCore.Attributes;
 
 namespace Kong.Aspnetcore.AdminApi
 {
@@ -20,18 +20,16 @@ namespace Kong.Aspnetcore.AdminApi
             return statusCode == HttpStatusCode.NotFound || base.IsSuccessStatusCode(statusCode);
         }
 
-        /// <summary>
-        /// 获取结果值
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        protected override async Task<object> GetTaskResult(ApiActionContext context)
+        public override async Task SetResultAsync(ApiResponseContext context)
         {
-            if (context.ResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            if (context.HttpContext.ResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                return default;
+                context.Result = default;
             }
-            return await base.GetTaskResult(context);
+            else
+            {
+                await base.SetResultAsync(context);
+            }
         }
     }
 }
