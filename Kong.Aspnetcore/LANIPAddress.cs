@@ -14,6 +14,19 @@ namespace Kong.Aspnetcore
     static class LANIPAddress
     {
         /// <summary>
+        /// 获取本机所有ip
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<IPAddress> GetAllAddresses()
+        {
+            return NetworkInterface
+                .GetAllNetworkInterfaces()
+                .SelectMany(item => item.GetIPProperties().UnicastAddresses)
+                .Select(item => item.Address)
+                .Where(item => item.AddressFamily == AddressFamily.InterNetwork);
+        }
+
+        /// <summary>
         /// 返回与目标域名或ip在同一网段的本机ip
         /// </summary>
         /// <param name="targetHost">目标域名或ip</param>

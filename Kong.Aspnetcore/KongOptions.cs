@@ -1,7 +1,10 @@
 ﻿using Kong.Aspnetcore.AdminApi;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Kong.Aspnetcore
 {
@@ -148,11 +151,11 @@ namespace Kong.Aspnetcore
         /// <summary>
         /// 指定本机为目标主机
         /// </summary>
-        /// <param name="host">本机域名或ip，{localhost}则自动替换为本机合适的局域网ip</param>
-        /// <param name="port">本机服务端口</param>
+        /// <param name="host">目标主机ip</param>
+        /// <param name="port">目标主机端口</param>
         /// <param name="weight">主机的服务比重</param>
         /// <returns></returns>
-        public KongOptions WithUpstreamTarget(string host = "{localhost}", int port = 8000, int weight = 100)
+        public KongOptions WithUpstreamTarget(string host, int port, int weight = 100)
         {
             this.WithUpStream();
             this.UpStream.Targets.Add(new KongTarget
@@ -161,6 +164,87 @@ namespace Kong.Aspnetcore
                 Weight = weight
             });
             return this;
+        }
+
+        /// <summary>
+        /// 使用配置的urls作为目标主机
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="weight">主机的服务比重</param>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="LANIPAddressNotMatchException"></exception>
+        /// <returns></returns>
+        public KongOptions WithUpstreamTarget(IConfiguration configuration, int weight = 100)
+        {
+            var urls = GetConfigurationUrls(configuration).ToArray();
+
+            if (urls.Length == 1)
+            {
+                var uri = urls.FirstOrDefault();
+                return this.WithUpstreamTarget(uri.Host, uri.Port, weight);
+            }
+
+            if (this.AdminApi == null)
+            {
+                throw new InvalidOperationException($"请先设置{nameof(AdminApi)}");
+            }
+
+            var hostIp = LANIPAddress.GetMatchLANIPAddress(this.AdminApi.Host);
+            if (hostIp == null)
+            {
+                hostIp = LANIPAddress.GetMatchLANIPAddress(this.AdminApi);
+            }
+            if (hostIp == null)
+            {
+                throw new LANIPAddressNotMatchException($"无法获取到与{this.AdminApi.Host}可通讯的主机ip");
+            }
+
+            var matchUri = urls.FirstOrDefault(item => item.Host == hostIp.ToString());
+            if (matchUri == null)
+            {
+                throw new LANIPAddressNotMatchException($"无法获取到与{this.AdminApi.Host}可通讯的主机ip");
+            }
+            return this.WithUpstreamTarget(matchUri.Host, matchUri.Port, weight);
+        }
+
+        /// <summary>
+        /// 获取配置监听的Uri
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        private static IEnumerable<Uri> GetConfigurationUrls(IConfiguration configuration)
+        {
+            var defaultUri = new Uri("http://localhost:5000/");
+            var urls = configuration.GetValue<string>("urls");
+            if (string.IsNullOrEmpty(urls))
+            {
+                yield return defaultUri;
+                yield break;
+            }
+
+            var http = urls
+                .Split(";", StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault(item => item.StartsWith("http://", StringComparison.OrdinalIgnoreCase));
+
+            if (http == null)
+            {
+                yield return defaultUri;
+                yield break;
+            }
+
+            var useAnyIp = http.Contains("//*") || http.Contains("//#");
+            if (useAnyIp == false)
+            {
+                yield return new Uri(http);
+                yield break;
+            }
+
+            var match = Regex.Match(http, @"(?<=:)\d+");
+            var port = match.Success ? int.Parse(match.Value) : 80;
+            foreach (var ip in LANIPAddress.GetAllAddresses())
+            {
+                yield return new Uri($"http://{ip}:{port}");
+            }
         }
     }
 }
