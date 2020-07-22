@@ -66,6 +66,12 @@ namespace Kong.Aspnetcore
                 service = await kong.AddServiceAsync(local.Service);
                 logger.LogInformation($"添加服务{local.Service.Name} ok.");
             }
+            else
+            {
+                logger.LogInformation($"正在更新服务{local.Service.Name}");
+                service = await kong.UpdateServiceAsync(service.Id, local.Service);
+                logger.LogInformation($"更新服务{local.Service.Name} ok.");
+            }
 
             var routes = await kong.GetRoutesAsync(service.Id);
             foreach (var localRoute in local.Service.Routes)
