@@ -210,7 +210,7 @@ namespace Kong.Aspnetcore
         /// <returns></returns>
         private static IEnumerable<Uri> GetConfigurationUrls(IConfiguration configuration)
         {
-            var defaultUri = new Uri("http://localhost:5000/");
+            var defaultUri = new Uri("http://127.0.0.1:5000/");
             var urls = configuration.GetValue<string>("urls");
             if (string.IsNullOrEmpty(urls))
             {
@@ -239,7 +239,7 @@ namespace Kong.Aspnetcore
             var port = match.Success ? int.Parse(match.Value) : 80;
             foreach (var ip in LANIPAddress.GetAllAddresses())
             {
-                yield return new Uri($"http://{ip}:{port}");
+                yield return new Uri($"http://{ip}:{port}/");
             }
         }
     }
