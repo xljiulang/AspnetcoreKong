@@ -89,7 +89,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="app"></param>
         public static async void UseKong(this IApplicationBuilder app)
         {
-            await app.ApplicationServices.GetRequiredService<KongApplication>().RegisterAsync();
+            await app
+                .ApplicationServices
+                .GetRequiredService<KongApplication>()
+                .RegisterAsync();
         }
     }
 }

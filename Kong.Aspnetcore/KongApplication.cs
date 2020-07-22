@@ -13,7 +13,7 @@ namespace Kong.Aspnetcore
     public class KongApplication
     {
         private readonly IKongAdminApi kong;
-        private readonly ILogger<IKongAdminApi> logger; 
+        private readonly ILogger<IKongAdminApi> logger;
         private readonly IOptions<KongOptions> local;
 
         /// <summary>
@@ -22,11 +22,11 @@ namespace Kong.Aspnetcore
         /// <param name="local"></param>
         /// <param name="kong"></param>
         /// <param name="logger"></param>
-        public KongApplication(  IOptions<KongOptions> local, IKongAdminApi kong, ILogger<IKongAdminApi> logger)
-        { 
+        public KongApplication(IOptions<KongOptions> local, IKongAdminApi kong, ILogger<IKongAdminApi> logger)
+        {
+            this.local = local;
             this.kong = kong;
             this.logger = logger;
-            this.local = local;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Kong.Aspnetcore
             {
                 this.logger.LogError(ex, ex.Message);
             }
-        } 
+        }
 
         /// <summary>
         /// 注册服务到kong

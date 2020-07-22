@@ -192,10 +192,6 @@ namespace Kong.Aspnetcore
             var hostIp = LANIPAddress.GetMatchLANIPAddress(this.AdminApi.Host);
             if (hostIp == null)
             {
-                hostIp = LANIPAddress.GetMatchLANIPAddress(this.AdminApi);
-            }
-            if (hostIp == null)
-            {
                 throw new LANIPAddressNotMatchException($"无法获取到与{this.AdminApi.Host}可通讯的主机ip");
             }
 
@@ -232,13 +228,13 @@ namespace Kong.Aspnetcore
                 yield break;
             }
 
-            var useAnyIp = http.Contains("//*") || http.Contains("//#");
-            if (useAnyIp == false)
+            if (Uri.TryCreate(http, UriKind.Absolute, out var uri) == true)
             {
-                yield return new Uri(http);
+                yield return uri;
                 yield break;
             }
 
+            // http://*:{port}
             var match = Regex.Match(http, @"(?<=:)\d+");
             var port = match.Success ? int.Parse(match.Value) : 80;
             foreach (var ip in LANIPAddress.GetAllAddresses())
