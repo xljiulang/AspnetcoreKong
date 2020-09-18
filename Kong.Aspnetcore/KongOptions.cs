@@ -3,8 +3,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Kong.Aspnetcore
 {
@@ -169,78 +167,23 @@ namespace Kong.Aspnetcore
         /// <summary>
         /// 使用配置的urls作为目标主机
         /// </summary>
-        /// <param name="configuration"></param>
         /// <param name="weight">主机的服务比重</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="LANIPAddressNotMatchException"></exception>
         /// <returns></returns>
-        public KongOptions WithUpstreamTarget(IConfiguration configuration, int weight = 100)
+        public KongOptions WithUpstreamTarget(int weight = 100)
         {
-            var urls = GetConfigurationUrls(configuration).ToArray();
-
-            if (urls.Length == 1)
-            {
-                var uri = urls.FirstOrDefault();
-                return this.WithUpstreamTarget(uri.Host, uri.Port, weight);
-            }
-
-            if (this.AdminApi == null)
-            {
-                throw new InvalidOperationException($"请先设置{nameof(AdminApi)}");
-            }
-
-            var hostIp = LANIPAddress.GetMatchLANIPAddress(this.AdminApi.Host);
-            if (hostIp == null)
-            {
-                throw new LANIPAddressNotMatchException($"无法获取到与{this.AdminApi.Host}可通讯的主机ip");
-            }
-
-            var matchUri = urls.FirstOrDefault(item => item.Host == hostIp.ToString());
-            if (matchUri == null)
-            {
-                throw new LANIPAddressNotMatchException($"无法获取到与{this.AdminApi.Host}可通讯的主机ip");
-            }
-            return this.WithUpstreamTarget(matchUri.Host, matchUri.Port, weight);
+            return this.WithUpstreamTarget("*", weight);
         }
 
         /// <summary>
-        /// 获取配置监听的Uri
+        /// 使用配置的urls作为目标主机
         /// </summary>
         /// <param name="configuration"></param>
+        /// <param name="weight">主机的服务比重</param>
         /// <returns></returns>
-        private static IEnumerable<Uri> GetConfigurationUrls(IConfiguration configuration)
+        [Obsolete]
+        public KongOptions WithUpstreamTarget(IConfiguration configuration, int weight = 100)
         {
-            var defaultUri = new Uri("http://127.0.0.1:5000/");
-            var urls = configuration.GetValue<string>("urls");
-            if (string.IsNullOrEmpty(urls))
-            {
-                yield return defaultUri;
-                yield break;
-            }
-
-            var http = urls
-                .Split(";", StringSplitOptions.RemoveEmptyEntries)
-                .FirstOrDefault(item => item.StartsWith("http://", StringComparison.OrdinalIgnoreCase));
-
-            if (http == null)
-            {
-                yield return defaultUri;
-                yield break;
-            }
-
-            if (Uri.TryCreate(http, UriKind.Absolute, out var uri) == true)
-            {
-                yield return uri;
-                yield break;
-            }
-
-            // http://*:{port}
-            var match = Regex.Match(http, @"(?<=:)\d+");
-            var port = match.Success ? int.Parse(match.Value) : 80;
-            foreach (var ip in LANIPAddress.GetAllAddresses())
-            {
-                yield return new Uri($"http://{ip}:{port}/");
-            }
+            return this.WithUpstreamTarget(weight);
         }
     }
 }

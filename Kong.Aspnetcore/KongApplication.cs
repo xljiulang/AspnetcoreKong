@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Kong.Aspnetcore
@@ -12,9 +13,9 @@ namespace Kong.Aspnetcore
     /// </summary>
     public class KongApplication
     {
+        private readonly KongOptions local;
         private readonly IKongAdminApi kong;
-        private readonly ILogger<IKongAdminApi> logger;
-        private readonly IOptions<KongOptions> local;
+        private readonly ILogger logger;
 
         /// <summary>
         /// KongApplication
@@ -24,7 +25,7 @@ namespace Kong.Aspnetcore
         /// <param name="logger"></param>
         public KongApplication(IOptions<KongOptions> local, IKongAdminApi kong, ILogger<IKongAdminApi> logger)
         {
-            this.local = local;
+            this.local = local.Value;
             this.kong = kong;
             this.logger = logger;
         }
@@ -37,15 +38,8 @@ namespace Kong.Aspnetcore
         {
             try
             {
-                var options = this.local.Value;
-                if (options.RouteNamePrefix == true)
-                {
-                    foreach (var route in options.Service.Routes)
-                    {
-                        route.Name = $"{options.Service.Name}_{route.Name}";
-                    }
-                }
-                await RegisterAsync(options, this.kong, this.logger);
+                await FixKongOptionsAsync();
+                await RegisterCoreAsync();
             }
             catch (Exception ex)
             {
@@ -54,10 +48,51 @@ namespace Kong.Aspnetcore
         }
 
         /// <summary>
+        /// 修复kong选项
+        /// </summary>
+        /// <returns></returns>
+        private async Task FixKongOptionsAsync()
+        {
+            if (local.AdminApi == null)
+            {
+                throw new InvalidOperationException($"请先设置{nameof(AdminApi)}");
+            }
+
+            if (local.RouteNamePrefix == true)
+            {
+                foreach (var route in local.Service.Routes)
+                {
+                    route.Name = $"{local.Service.Name}_{route.Name}";
+                }
+            }
+
+            if (local.UpStream != null)
+            {
+                var localAddress = LANIPAddress.GetMatchLANIPAddress(local.AdminApi.Host);
+                foreach (var target in local.UpStream.Targets)
+                {
+                    var endpoint = target.GetTargetEndPoint();
+                    if (endpoint.Address.Equals(IPAddress.Any) == false)
+                    {
+                        continue;
+                    }
+
+                    if (localAddress == null)
+                    {
+                        throw new LANIPAddressNotMatchException($"无法获取到与{local.AdminApi.Host}可通讯的服务ip");
+                    }
+
+                    target.Target = $"{localAddress}:{endpoint.Port}";
+                }
+            }
+        }
+
+
+        /// <summary>
         /// 注册服务到kong
         /// </summary> 
         /// <returns></returns>
-        private static async Task RegisterAsync(KongOptions local, IKongAdminApi kong, ILogger logger)
+        private async Task RegisterCoreAsync()
         {
             var service = await kong.GetServiceAsync(local.Service.Name);
             if (service == null)

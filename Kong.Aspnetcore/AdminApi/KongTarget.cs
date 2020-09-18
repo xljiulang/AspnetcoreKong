@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
+using System.Net;
 
 namespace Kong.Aspnetcore.AdminApi
 {
@@ -31,5 +33,31 @@ namespace Kong.Aspnetcore.AdminApi
         /// 关联的上游
         /// </summary>
         public KongObject Upstream { get; set; }
+
+        /// <summary>
+        /// 获取目标节点
+        /// </summary>
+        /// <returns></returns>
+        public IPEndPoint GetTargetEndPoint()
+        {
+            const int defaultPort = 8000;
+            if (string.IsNullOrEmpty(this.Target))
+            {
+                return new IPEndPoint(IPAddress.Any, defaultPort);
+            }
+
+            var endpoint = this.Target.Split(':');
+            if (IPAddress.TryParse(endpoint.First(), out var ip) == false)
+            {
+                ip = IPAddress.Any;
+            }
+
+            if (int.TryParse(endpoint.Last(), out var port) == false)
+            {
+                port = defaultPort;
+            }
+
+            return new IPEndPoint(ip, port);
+        }
     }
 }
