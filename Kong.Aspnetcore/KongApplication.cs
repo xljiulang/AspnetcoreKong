@@ -38,7 +38,7 @@ namespace Kong.Aspnetcore
         {
             try
             {
-                await FixKongOptionsAsync();
+                await FixOptionsAsync();
                 await RegisterCoreAsync();
             }
             catch (Exception ex)
@@ -51,7 +51,7 @@ namespace Kong.Aspnetcore
         /// 修复kong选项
         /// </summary>
         /// <returns></returns>
-        private async Task FixKongOptionsAsync()
+        private async Task FixOptionsAsync()
         {
             if (local.AdminApi == null)
             {
@@ -68,21 +68,15 @@ namespace Kong.Aspnetcore
 
             if (local.UpStream != null)
             {
-                var localAddress = LANIPAddress.GetMatchLANIPAddress(local.AdminApi.Host);
+                local.UpStream.Name = local.Service.Host;
                 foreach (var target in local.UpStream.Targets)
                 {
                     var endpoint = target.GetTargetEndPoint();
-                    if (endpoint.Address.Equals(IPAddress.Any) == false)
+                    if (endpoint.Address.Equals(IPAddress.Any) == true)
                     {
-                        continue;
+                        var address = await ServerAddress.GetServerAddressAsync(local.AdminApi);
+                        target.Target = $"{address}:{endpoint.Port}";
                     }
-
-                    if (localAddress == null)
-                    {
-                        throw new LANIPAddressNotMatchException($"无法获取到与{local.AdminApi.Host}可通讯的服务ip");
-                    }
-
-                    target.Target = $"{localAddress}:{endpoint.Port}";
                 }
             }
         }

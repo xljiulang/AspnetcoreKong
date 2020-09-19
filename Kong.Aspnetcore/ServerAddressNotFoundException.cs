@@ -3,15 +3,15 @@
 namespace Kong.Aspnetcore
 {
     /// <summary>
-    /// 表示局域网IP匹配异常
+    /// 表示找不到服务地址的异常
     /// </summary>
-    public class LANIPAddressNotMatchException : Exception
+    public class ServerAddressNotFoundException : Exception
     {
         /// <summary>
-        /// 局域网IP匹配异常
+        /// 找不到服务地址的异常
         /// </summary>
         /// <param name="message"></param>
-        public LANIPAddressNotMatchException(string message)
+        public ServerAddressNotFoundException(string message)
             : base(message)
         {
         }

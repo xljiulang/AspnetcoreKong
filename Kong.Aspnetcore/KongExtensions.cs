@@ -13,29 +13,41 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class KongExtensions
     {
         /// <summary>
-        /// 添加Kong配置
+        /// 添加Kong
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
         public static OptionsBuilder<KongOptions> AddKong(this IServiceCollection services)
         {
-            return services.AddKongCore().AddKongOptions();
+            services
+                .AddSingleton<KongApplication>()
+                .AddHttpApi<IKongAdminApi>()
+                .ConfigureHttpClient((s, httpClient) =>
+                {
+                    var options = s.GetService<IOptions<KongOptions>>().Value;
+                    httpClient.BaseAddress = options.AdminApi;
+                    foreach (var item in options.AdminApiHeaders)
+                    {
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
+                    }
+                });
+
+            return services.AddOptions<KongOptions>();
         }
 
         /// <summary>
-        /// 添加Kong配置
+        /// 添加Kong
         /// </summary>
         /// <param name="services"></param>
         /// <param name="configuration">kong配置</param>
         /// <returns></returns>
         public static IServiceCollection AddKong(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddKong().Bind(configuration);
-            return services;
+            return services.AddKong().Bind(configuration).Services;
         }
 
         /// <summary>
-        /// 添加Kong配置
+        /// 添加Kong
         /// </summary>
         /// <param name="services"></param>
         /// <param name="configuration">kong配置</param>
@@ -43,12 +55,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddKong(this IServiceCollection services, IConfiguration configuration, Action<KongOptions> configureOptions)
         {
-            services.AddKong().Bind(configuration).Configure(configureOptions);
-            return services;
+            return services.AddKong().Bind(configuration).Configure(configureOptions).Services;
         }
 
         /// <summary>
-        /// 添加Kong配置
+        /// 添加Kong
         /// </summary>
         /// <param name="services"></param>
         /// <param name="configuration">kong配置</param>
@@ -56,49 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddKong(this IServiceCollection services, IConfiguration configuration, Action<KongOptions, IServiceProvider> configureOptions)
         {
-            services.AddKong().Bind(configuration).Configure(configureOptions);
-            return services;
-        }
-
-        /// <summary>
-        /// 添加kong
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddKongCore(this IServiceCollection services)
-        {
-            services
-               .AddSingleton<KongApplication>()
-               .AddHttpApi<IKongAdminApi>()
-               .ConfigureHttpClient((s, c) =>
-               {
-                   var kong = s.GetService<IOptions<KongOptions>>().Value;
-                   c.BaseAddress = kong.AdminApi;
-                   foreach (var item in kong.AdminApiHeaders)
-                   {
-                       c.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
-                   }
-               });
-
-            return services;
-        }
-
-        /// <summary>
-        /// 添加选项
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static OptionsBuilder<KongOptions> AddKongOptions(this IServiceCollection services)
-        {
-            return services
-                .AddOptions<KongOptions>()
-                .PostConfigure(o =>
-                {
-                    if (o.UpStream != null)
-                    {
-                        o.UpStream.Name = o.Service.Host;
-                    }
-                });
+            return services.AddKong().Bind(configuration).Configure(configureOptions).Services;
         }
 
         /// <summary>

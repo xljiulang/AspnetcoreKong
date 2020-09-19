@@ -171,7 +171,7 @@ namespace Kong.Aspnetcore
         /// <returns></returns>
         public KongOptions WithUpstreamTarget(int weight = 100)
         {
-            return this.WithUpstreamTarget("*", weight);
+            return this.WithUpstreamTarget("*", 8000, weight);
         }
 
         /// <summary>
