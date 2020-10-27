@@ -1,5 +1,4 @@
 ﻿using Kong.Aspnetcore.AdminApi;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -171,19 +170,7 @@ namespace Kong.Aspnetcore
         /// <returns></returns>
         public KongOptions WithUpstreamTarget(int weight = 100)
         {
-            return this.WithUpstreamTarget("*", 8000, weight);
-        }
-
-        /// <summary>
-        /// 使用配置的urls作为目标主机
-        /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="weight">主机的服务比重</param>
-        /// <returns></returns>
-        [Obsolete]
-        public KongOptions WithUpstreamTarget(IConfiguration configuration, int weight = 100)
-        {
-            return this.WithUpstreamTarget(weight);
+            return this.WithUpstreamTarget("*", 0, weight);
         }
     }
 }

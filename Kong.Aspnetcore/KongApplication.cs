@@ -1,9 +1,11 @@
 ﻿using Kong.Aspnetcore.AdminApi;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Kong.Aspnetcore
@@ -16,6 +18,7 @@ namespace Kong.Aspnetcore
         private readonly KongOptions local;
         private readonly IKongAdminApi kong;
         private readonly ILogger logger;
+        private readonly int httpPort;
 
         /// <summary>
         /// KongApplication
@@ -23,12 +26,51 @@ namespace Kong.Aspnetcore
         /// <param name="local"></param>
         /// <param name="kong"></param>
         /// <param name="logger"></param>
-        public KongApplication(IOptions<KongOptions> local, IKongAdminApi kong, ILogger<IKongAdminApi> logger)
+        /// <param name="configuration"></param>
+        public KongApplication(IOptions<KongOptions> local, IKongAdminApi kong, ILogger<IKongAdminApi> logger, IConfiguration configuration)
         {
             this.local = local.Value;
             this.kong = kong;
             this.logger = logger;
+
+            this.httpPort = GetServerPort(configuration);
         }
+
+
+        /// <summary>
+        /// 获取配置的http端口
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        private static int GetServerPort(IConfiguration configuration)
+        {
+            var defaultPort = 5000;
+            var urls = configuration.GetValue<string>("urls");
+            if (string.IsNullOrEmpty(urls))
+            {
+                return defaultPort;
+            }
+
+            var http = urls
+                .Split(";", StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault(item => item.StartsWith("http://", StringComparison.OrdinalIgnoreCase));
+
+            if (http == null)
+            {
+                return defaultPort;
+
+            }
+
+            if (Uri.TryCreate(http, UriKind.Absolute, out var uri) == true)
+            {
+                return uri.Port;
+            }
+
+            // http://*:{port}
+            var match = Regex.Match(http, @"(?<=:)\d+");
+            return match.Success ? int.Parse(match.Value) : 80;
+        }
+
 
         /// <summary>
         /// 注册服务到kong
@@ -72,11 +114,20 @@ namespace Kong.Aspnetcore
                 foreach (var target in local.UpStream.Targets)
                 {
                     var endpoint = target.GetTargetEndPoint();
-                    if (endpoint.Address.Equals(IPAddress.Any) == true)
+                    var address = endpoint.Address;
+                    var port = endpoint.Port;
+
+                    if (address.Equals(IPAddress.Any) == true)
                     {
-                        var address = await ServerAddress.GetServerAddressAsync(local.AdminApi);
-                        target.Target = $"{address}:{endpoint.Port}";
+                        address = await ServerAddress.GetServerAddressAsync(local.AdminApi);
                     }
+
+                    if (port <= 0)
+                    {
+                        port = this.httpPort;
+                    }
+
+                    target.Target = $"{address}:{port}";
                 }
             }
         }
