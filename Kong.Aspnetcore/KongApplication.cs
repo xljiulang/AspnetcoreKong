@@ -113,13 +113,13 @@ namespace Kong.Aspnetcore
                 local.UpStream.Name = local.Service.Host;
                 foreach (var target in local.UpStream.Targets)
                 {
-                    var endpoint = target.GetTargetEndPoint();
-                    var address = endpoint.Address;
-                    var port = endpoint.Port;
+                    var host = await target.GetHostAsync();
+                    var port = target.GetPort();
 
-                    if (address.Equals(IPAddress.Any) == true)
+                    if (IPAddress.Any.ToString() == host)
                     {
-                        address = await ServerAddress.GetServerAddressAsync(local.AdminApi);
+                        var ip = await ServerAddress.GetServerAddressAsync(local.AdminApi);
+                        host = ip.ToString();
                     }
 
                     if (port <= 0)
@@ -127,7 +127,7 @@ namespace Kong.Aspnetcore
                         port = this.httpPort;
                     }
 
-                    target.Target = $"{address}:{port}";
+                    target.Target = $"{host}:{port}";
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Kong.Aspnetcore.AdminApi
 {
@@ -34,30 +35,53 @@ namespace Kong.Aspnetcore.AdminApi
         /// </summary>
         public KongObject Upstream { get; set; }
 
+
         /// <summary>
-        /// 获取目标节点
+        /// 获取端口
         /// </summary>
         /// <returns></returns>
-        public IPEndPoint GetTargetEndPoint()
+        public int GetPort()
         {
-            const int defaultPort = 8000;
             if (string.IsNullOrEmpty(this.Target))
             {
-                return new IPEndPoint(IPAddress.Any, defaultPort);
+                return 0;
             }
-
-            var endpoint = this.Target.Split(':');
-            if (IPAddress.TryParse(endpoint.First(), out var ip) == false)
+            var hostPort = this.Target.Split(':');
+            if (hostPort.Length == 1)
             {
-                ip = IPAddress.Any;
+                return 0;
             }
 
-            if (int.TryParse(endpoint.Last(), out var port) == false)
+            int.TryParse(hostPort.Last(), out var port);
+            return port;
+        }
+
+        /// <summary>
+        /// 获取主机
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetHostAsync()
+        {
+            if (string.IsNullOrEmpty(this.Target))
             {
-                port = defaultPort;
+                return IPAddress.Any.ToString();
             }
 
-            return new IPEndPoint(ip, port);
+            var host = this.Target.Split(':').FirstOrDefault();
+            if (IPAddress.TryParse(host, out _))
+            {
+                return host;
+            }
+
+            try
+            {
+                await Dns.GetHostEntryAsync(host);
+                return host;
+            }
+            catch (Exception)
+            {
+                return IPAddress.Any.ToString();
+            }
         }
     }
 }
