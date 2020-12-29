@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Kong.Aspnetcore.AdminApi
 {
@@ -60,28 +59,20 @@ namespace Kong.Aspnetcore.AdminApi
         /// 获取主机
         /// </summary>
         /// <returns></returns>
-        public async Task<string> GetHostAsync()
+        public string GetHost()
         {
             if (string.IsNullOrEmpty(this.Target))
             {
-                return IPAddress.Any.ToString();
+                return null;
             }
 
             var host = this.Target.Split(':').FirstOrDefault();
-            if (IPAddress.TryParse(host, out _))
-            {
-                return host;
-            }
-
-            try
-            {
-                await Dns.GetHostEntryAsync(host);
-                return host;
-            }
-            catch (Exception)
-            {
-                return IPAddress.Any.ToString();
-            }
+            return host == "*"
+                || host == "+"
+                || host == IPAddress.Any.ToString()
+                || host == IPAddress.IPv6Any.ToString()
+                ? null
+                : host;
         }
     }
 }

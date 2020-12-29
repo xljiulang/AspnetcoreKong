@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -113,10 +112,10 @@ namespace Kong.Aspnetcore
                 local.UpStream.Name = local.Service.Host;
                 foreach (var target in local.UpStream.Targets)
                 {
-                    var host = await target.GetHostAsync();
+                    var host = target.GetHost();
                     var port = target.GetPort();
 
-                    if (IPAddress.Any.ToString() == host)
+                    if (string.IsNullOrEmpty(host) == true)
                     {
                         var ip = await ServerAddress.GetServerAddressAsync(local.AdminApi);
                         host = ip.ToString();
